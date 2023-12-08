@@ -526,11 +526,13 @@
 							</div>
 						</div>
 						<div class="col-md-12 col-sm-4">
-							<button type="button" onclick="simpanData()" class="btn btn-default btn-block">Kirim</button>
+							<button type="button" onclick="simpanData(event)" class="btn btn-default btn-block">Kirim</button>
 						</div>
 					<!-- </form> -->
+					<div id="ucapanContainer" class="bg-warning"></div>
 				</div>
 			</div>
+
 		</div>
 	</div>
 
@@ -592,7 +594,42 @@
 		};	  
 		firebase.initializeApp(firebaseConfig);
 		const db = firebase.firestore();
-		async function simpanData() {
+
+		const ucapanContainer = document.getElementById('ucapanContainer');
+        const loadMoreButton = document.getElementById('loadMoreButton');
+        let lastVisibleDoc = null;
+
+		tampilkanUcapan();
+
+        function tampilkanUcapan() {
+            db.collection('ucapan')
+                // .orderBy('timestamp', 'desc')
+                .limit(10)
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+						console.log(doc.id, " => ", doc.data());
+                        const ucapanData = doc.data();
+                        tambahkanUcapanKeHTML(ucapanData);
+                    });
+                    lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+                })
+                .catch((error) => {
+                    console.error('Error saat mengambil ucapan:', error);
+                });
+        }
+        function tambahkanUcapanKeHTML(ucapanData) {
+            const ucapanBlock = document.createElement('div');
+            ucapanBlock.className = 'kotak-pesan';
+            ucapanBlock.innerHTML = `
+                <h2>${ucapanData.name}</h2>
+                <p>${ucapanData.wish}</p>
+            `;
+            ucapanContainer.appendChild(ucapanBlock);
+        }
+
+		 function simpanData(event) {
+			event.preventDefault();
 			const name = document.getElementById('name');
             const wish = document.getElementById('wish');
 			if (name.value != '' && wish.value != '') {
@@ -603,7 +640,8 @@
 				.then((docRef) => {
 					name.value = '';
 					wish.value = '';
-					console.log("Document written with ID: ", docRef.id);
+					tampilkanUcapan();
+					// console.log("Document written with ID: ", docRef.id);
 				})
 				.catch((error) => {
 					console.error("Error adding document: ", error);
