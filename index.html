@@ -513,7 +513,7 @@
 			</div>
 			<div class="row animate-box">
 				<div class="col-md-10 col-md-offset-1">
-					<form class="form-inline">
+					<!-- <form class="form-inline"> -->
 						<div class="col-md-12 col-sm-4">
 							<div class="form-group">
 								<label for="name" class="sr-only">Nama</label>
@@ -526,9 +526,9 @@
 							</div>
 						</div>
 						<div class="col-md-12 col-sm-4">
-							<button type="submit" class="btn btn-default btn-block">Kirim</button>
+							<button type="button" onclick="simpanData()" class="btn btn-default btn-block">Kirim</button>
 						</div>
-					</form>
+					<!-- </form> -->
 				</div>
 			</div>
 		</div>
@@ -556,11 +556,9 @@
 		</div>
 	</footer>
 	</div>
-
 	<div class="gototop js-top">
 		<a href="#" class="js-gotop"><i class="icon-arrow-up"></i></a>
 	</div>
-	
 	<!-- jQuery -->
 	<script src="js/jquery.min.js"></script>
 	<!-- jQuery Easing -->
@@ -573,64 +571,81 @@
 	<script src="js/owl.carousel.min.js"></script>
 	<!-- countTo -->
 	<script src="js/jquery.countTo.js"></script>
-
 	<!-- Stellar -->
 	<script src="js/jquery.stellar.min.js"></script>
 	<!-- Magnific Popup -->
 	<script src="js/jquery.magnific-popup.min.js"></script>
 	<script src="js/magnific-popup-options.js"></script>
-
-	<!-- // <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.js"></script> -->
 	<script src="js/simplyCountdown.js"></script>
 	<!-- Main -->
 	<script src="js/main.js"></script>
-
+	<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 	<script>
-    // var d = new Date(new Date().getTime() + 200 * 120 * 120 * 2000);
-
-    // default example
-    simplyCountdown('.simply-countdown-one', {
-        year: 2023,
-        month: 12,
-        day: 15,
-		words: { 
-			days: 'Hari',
-			hours: 'Jam',
-			minutes: 'Menit',
-			seconds: 'Detik',
-			pluralLetter: ''
-		},
-    });
-</script>
-<script>
-	function tambahkanPengingat() {
-		// Cek apakah Browser mendukung API
-		if (typeof navigator !== 'undefined' && 'calendar' in navigator) {
-			// Detail acara/pengingat
-			const acara = {
-				title: 'Potong gigi / mepandes',
-				location: 'Jl. Pahlawan Lejeh, Baturiti, Kec. Kerambitan, Kabupaten Tabanan, Bali 82161',
-				description: 'Potong gigi / mepandes I Gede Rama Wahyudana & Kadek Krisna Wahyudana',
-				start: new Date('2023-12-14T12:00:00'), // Waktu mulai
-				end: new Date('2023-12-15T13:00:00')   // Waktu selesai
-			};
-
-			// Minta izin pengguna untuk menambahkan acara ke kalender
-			navigator.calendar
-				.addEvent(acara)
-				.then(() => {
-					alert('Pengingat berhasil ditambahkan ke kalender.');
+		const firebaseConfig = {
+		  apiKey: "AIzaSyDjdFVxONPYWe6d_CDVclOXKYNSddh2Kfk",
+		  authDomain: "undangan-mepandes-1e93a.firebaseapp.com",
+		  projectId: "undangan-mepandes-1e93a",
+		  storageBucket: "undangan-mepandes-1e93a.appspot.com",
+		  messagingSenderId: "123457272590",
+		  appId: "1:123457272590:web:ee2e7d62f1ef0f645e755f"
+		};	  
+		firebase.initializeApp(firebaseConfig);
+		const db = firebase.firestore();
+		async function simpanData() {
+			const name = document.getElementById('name');
+            const wish = document.getElementById('wish');
+			if (name.value != '' && wish.value != '') {
+				db.collection("ucapan").add({
+					name: name.value,
+					wish: wish.value
+				})
+				.then((docRef) => {
+					name.value = '';
+					wish.value = '';
+					console.log("Document written with ID: ", docRef.id);
 				})
 				.catch((error) => {
-					console.error('Gagal menambahkan pengingat:', error);
+					console.error("Error adding document: ", error);
 				});
-		} else {
-			// Tampilkan pesan jika Browser tidak mendukung API kalender
-			alert('Browser tidak mendukung penambahan pengingat ke kalender.');
+			}	
+        }
+	</script>
+	<script>
+		simplyCountdown('.simply-countdown-one', {
+			year: 2023,
+			month: 12,
+			day: 15,
+			words: { 
+				days: 'Hari',
+				hours: 'Jam',
+				minutes: 'Menit',
+				seconds: 'Detik',
+				pluralLetter: ''
+			},
+		});
+		function tambahkanPengingat() {
+			if (typeof navigator !== 'undefined' && 'calendar' in navigator) {
+				const acara = {
+					title: 'Potong gigi / mepandes',
+					location: 'Jl. Pahlawan Lejeh, Baturiti, Kec. Kerambitan, Kabupaten Tabanan, Bali 82161',
+					description: 'Potong gigi / mepandes I Gede Rama Wahyudana & Kadek Krisna Wahyudana',
+					start: new Date('2023-12-14T12:00:00'), // Waktu mulai
+					end: new Date('2023-12-15T13:00:00')   // Waktu selesai
+				};
+				navigator.calendar
+					.addEvent(acara)
+					.then(() => {
+						alert('Pengingat berhasil ditambahkan ke kalender.');
+					})
+					.catch((error) => {
+						console.error('Gagal menambahkan pengingat:', error);
+					});
+			} else {
+				alert('Browser tidak mendukung penambahan pengingat ke kalender.');
+			}
 		}
-	}
-</script>
-
-	</body>
+	</script>
+</body>
 </html>
 
