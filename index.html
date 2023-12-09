@@ -663,26 +663,32 @@
 				pluralLetter: ''
 			},
 		});
+		function convertToRFC3339(dateTime, timeZone) {
+			const isoString = dateTime.toISOString();
+			const timeZoneOffset = timeZone ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Z';
+			const formattedDateTime = isoString.replace('Z', timeZoneOffset);
+
+			return formattedDateTime;
+		}
 		function tambahkanPengingat() {
-			if (typeof navigator !== 'undefined' && 'calendar' in navigator) {
-				const acara = {
-					title: 'Potong gigi / mepandes',
-					location: 'Jl. Pahlawan Lejeh, Baturiti, Kec. Kerambitan, Kabupaten Tabanan, Bali 82161',
-					description: 'Potong gigi / mepandes I Gede Rama Wahyudana & Kadek Krisna Wahyudana',
-					start: new Date('2023-12-14T12:00:00'), // Waktu mulai
-					end: new Date('2023-12-15T13:00:00')   // Waktu selesai
-				};
-				navigator.calendar
-					.addEvent(acara)
-					.then(() => {
-						alert('Pengingat berhasil ditambahkan ke kalender.');
-					})
-					.catch((error) => {
-						console.error('Gagal menambahkan pengingat:', error);
-					});
-			} else {
-				alert('Browser tidak mendukung penambahan pengingat ke kalender.');
-			}
+			const event = {
+				summary: 'Potong gigi / mepandes',
+				location: 'Jl. Pahlawan Lejeh, Baturiti, Kec. Kerambitan, Kabupaten Tabanan, Bali 82161',
+				description: 'Upacara potong gigi / mepandes Rama Wahyudana',
+				start: {
+					dateTime: new Date('2023-12-15T17:00:00'),
+					timeZone: 'Asia/Jakarta',
+				},
+				end: {
+					dateTime: new Date('2023-12-15T17:00:00'),
+					timeZone: 'Asia/Jakarta',
+				},
+			};
+			const startDateTime = convertToRFC3339(event.start.dateTime, event.start.timeZone);
+			const endDateTime = convertToRFC3339(event.end.dateTime, event.end.timeZone);
+			const url = `https://www.google.com/calendar/event?action=TEMPLATE&text=${encodeURIComponent(event.summary)}&dates=${encodeURIComponent(startDateTime)}/${encodeURIComponent(endDateTime)}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}&ctz=${encodeURIComponent(event.start.timeZone)}`;
+			window.open(url, '_blank');
+			
 		}
 	</script>
 </body>
